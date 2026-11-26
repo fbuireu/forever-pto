@@ -1,3 +1,4 @@
+import { paymentIntentIdFixture } from "@domain/payment/fixture";
 import { PaymentError, PaymentRequestError, WebhookError } from "@infrastructure/errors";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -95,7 +96,7 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.paymentIntents.retrieve("pi_123");
+				return yield* stripe.paymentIntents.retrieve(paymentIntentIdFixture("pi_123"));
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(result).toEqual(pi);
@@ -106,7 +107,7 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.paymentIntents.retrieve("pi_invalid").pipe(Effect.flip);
+				return yield* stripe.paymentIntents.retrieve(paymentIntentIdFixture("pi_invalid")).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(PaymentRequestError);
@@ -117,7 +118,7 @@ describe("StripeServerService.paymentIntents.retrieve", () => {
 		const error = await Effect.runPromise(
 			Effect.gen(function* () {
 				const stripe = yield* StripeServerService;
-				return yield* stripe.paymentIntents.retrieve("pi_bad").pipe(Effect.flip);
+				return yield* stripe.paymentIntents.retrieve(paymentIntentIdFixture("pi_bad")).pipe(Effect.flip);
 			}).pipe(Effect.provide(StripeServerServiceLive)),
 		);
 		expect(error).toBeInstanceOf(PaymentError);

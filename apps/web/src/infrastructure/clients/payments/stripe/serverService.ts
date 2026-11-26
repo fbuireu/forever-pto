@@ -1,3 +1,4 @@
+import type { PaymentIntentId } from "@domain/payment/paymentIntentId";
 import { PaymentError, PaymentRequestError, WebhookError } from "@infrastructure/errors";
 import { Context, Effect, Layer } from "effect";
 import StripeNode from "stripe";
@@ -24,7 +25,7 @@ export class StripeServerService extends Context.Tag("StripeServerService")<
 	{
 		paymentIntents: {
 			create(params: StripeNode.PaymentIntentCreateParams): Effect.Effect<StripeNode.PaymentIntent, PaymentError>;
-			retrieve(id: string): Effect.Effect<StripeNode.PaymentIntent, PaymentError>;
+			retrieve(id: PaymentIntentId): Effect.Effect<StripeNode.PaymentIntent, PaymentError>;
 		};
 		charges: {
 			retrieve(charge: RetrieveChargeParams): Effect.Effect<StripeNode.Charge, PaymentError>;

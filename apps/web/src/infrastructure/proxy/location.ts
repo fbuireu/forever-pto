@@ -1,4 +1,5 @@
 import { detectCountry } from "@infrastructure/services/location/detectCountry";
+import { isDetectedCountryCode } from "@infrastructure/services/location/utils/normalize";
 import type { NextRequest, NextResponse } from "next/server";
 import { setLocationCookie, USER_COUNTRY_COOKIE } from "./cookie";
 
@@ -10,7 +11,7 @@ interface LocationParams {
 export async function location({ request, response }: LocationParams): Promise<NextResponse> {
 	const knownCountry = request.cookies.get(USER_COUNTRY_COOKIE)?.value;
 
-	if (knownCountry) {
+	if (isDetectedCountryCode(knownCountry)) {
 		setLocationCookie({ response, country: knownCountry });
 
 		return response;

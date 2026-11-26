@@ -153,6 +153,15 @@ describe("POST /api/check-session", () => {
 		});
 	});
 
+	it("answers a premiumKey that is no payment intent id as an invalid payment reference, as Stripe's own refusal is", async () => {
+		const response = await POST(makeRequest({ email: "user@example.com", premiumKey: "not-an-intent" }) as never);
+
+		expect(response.status).toBe(400);
+		expect((await response.json()).error).toBe(ApiError.INVALID_PAYMENT_REFERENCE);
+		expect(mockActivateWithClaimedPayment).not.toHaveBeenCalled();
+		expect(mockActivateWithEmail).not.toHaveBeenCalled();
+	});
+
 	it("returns 400 on ValidationError", async () => {
 		mockActivateWithEmail.mockReturnValue(Effect.fail(new ValidationError({ message: "No payment found" })));
 		const response = await POST(makeRequest({ email: "user@example.com" }) as never);

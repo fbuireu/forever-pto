@@ -2,6 +2,7 @@ import { paymentDataDTO } from "@application/dto/payment/dto";
 import type { NewPayment } from "@application/dto/payment/types";
 import { emailDomain } from "@application/shared/utils/redact";
 import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
+import type { PaymentIntentId } from "@domain/payment/paymentIntentId";
 import type { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { type DatabaseError, type PaymentError, type SessionError, ValidationError } from "@infrastructure/errors";
@@ -18,18 +19,18 @@ import { createSession } from "@infrastructure/services/premium/session";
 import { Effect } from "effect";
 
 interface ActivateFromDonationParams {
-	paymentIntentId: string;
+	paymentIntentId: PaymentIntentId;
 	expectedEmail: string | undefined;
 	clientSecret: string | undefined;
 }
 
 export interface ActivateWithPaymentParams {
-	paymentIntentId: string;
+	paymentIntentId: PaymentIntentId;
 	clientSecret: string;
 }
 
 export interface ActivateWithClaimedPaymentParams {
-	paymentIntentId: string;
+	paymentIntentId: PaymentIntentId;
 	expectedEmail: string;
 }
 

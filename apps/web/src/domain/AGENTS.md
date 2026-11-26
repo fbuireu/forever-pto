@@ -9,7 +9,7 @@ request, reaches for a browser global, runs an Effect program or names a vendor'
 | Directory | Responsibility | Where it runs |
 | --- | --- | --- |
 | [`calendar/`](./calendar/AGENTS.md) | The planning engine: Workday enumeration, Bridge detection, Strategy selection, Alternatives, Metrics | browser main thread and Web Worker |
-| [`payment/`](./payment/AGENTS.md) | The events a Donation's webhook turns into and the payment statuses: types and constants only | server only |
+| [`payment/`](./payment/AGENTS.md) | The events a Donation's webhook turns into, the payment statuses and the `PaymentIntentId` brand: types, constants and one predicate | server only |
 
 They share no code and no types; Premium, the only thing that connects them, joins them in the application
 layer.
@@ -54,7 +54,8 @@ Holiday, so it belongs here. It is a known exception, safe only because the file
 [`../application/dto/AGENTS.md`](../application/dto/AGENTS.md).
 
 **`payment/` imports nothing.** [`payment/events/types.ts`](./payment/events/types.ts) is the events and the
-statuses, read by the use cases, the payments service and the payment DTO rules; see
+statuses, read by the use cases, the payments service and the payment DTO rules, and
+[`payment/paymentIntentId.ts`](./payment/paymentIntentId.ts) is the one branded identifier a context here owns; see
 [`payment/AGENTS.md`](./payment/AGENTS.md).
 
 ## What a broken calendar import looks like

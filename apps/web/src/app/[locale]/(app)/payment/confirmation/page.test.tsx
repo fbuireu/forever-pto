@@ -1,5 +1,6 @@
 import { ACTIVATION_FAILED, type PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { DE, EN, ES } from "@infrastructure/i18n/locales";
+import { LoggerService } from "@infrastructure/logging/service";
 import { type RenderResult, render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
 import { createFormatter, type Locale } from "next-intl";
@@ -8,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const NON_BREAKING_SPACES = /[  ]/g;
 
-const PAYMENT_INTENT_ID = "pi_test_123";
+const PAYMENT_INTENT_ID = "pi_test123";
 
 const mockRedirect = vi.fn();
 const mockGetTranslations = vi.fn();
@@ -17,7 +18,14 @@ const mockConfirmation = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({ redirect: mockRedirect }));
 
-vi.mock("@infrastructure/layers", () => ({ ApplicationLayer: Layer.empty }));
+vi.mock("@infrastructure/layers", () => ({
+	ApplicationLayer: Layer.succeed(LoggerService, {
+		info: vi.fn(),
+		warn: vi.fn(),
+		error: vi.fn(),
+		logError: vi.fn(),
+	}),
+}));
 
 vi.mock("@infrastructure/services/payments/confirmation", () => ({
 	confirmation: mockConfirmation,
@@ -148,6 +156,12 @@ describe("payment/confirmation page", () => {
 			const element = await PaymentConfirmationPage(makeSuccessParams());
 			expect(typeof element.type).toBe("function");
 			expect((element.type as { name?: string }).name).toBe("PaymentError");
+		});
+
+		it("returns PaymentError component, without reading Stripe, when the payment_intent is no payment intent id", async () => {
+			const element = await PaymentConfirmationPage(makeParams({ paymentIntent: "not-an-intent" }));
+			expect((element.type as { name?: string }).name).toBe("PaymentError");
+			expect(mockConfirmation).not.toHaveBeenCalled();
 		});
 
 		it("returns PaymentError component when status is not succeeded", async () => {

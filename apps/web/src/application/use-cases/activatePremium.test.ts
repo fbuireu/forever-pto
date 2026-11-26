@@ -1,3 +1,4 @@
+import { paymentIntentIdFixture } from "@domain/payment/fixture";
 import { TursoService } from "@infrastructure/clients/db/turso/service";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { DatabaseError, PaymentError, ValidationError } from "@infrastructure/errors";
@@ -18,6 +19,7 @@ vi.mock("@infrastructure/services/premium/session", () => ({
 }));
 
 const CLIENT_SECRET = "fixture-client-secret";
+const PAYMENT_INTENT_ID = paymentIntentIdFixture("pi_test");
 const STRIPE_CREATED_SECONDS = 1_736_000_000;
 
 const SUCCEEDED_INTENT = {
@@ -78,7 +80,7 @@ beforeEach(() => vi.clearAllMocks());
 describe("the two donation entry points", () => {
 	it("returns email, premiumKey and token on success", async () => {
 		const result = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		expect(result).toMatchObject({ email: "test@example.com", premiumKey: "pi_test", token: "jwt-token" });
 	});
@@ -87,7 +89,7 @@ describe("the two donation entry points", () => {
 		const { getSucceededPaymentByEmail, savePayment, updatePaymentStatus } = await import(
 			"@infrastructure/services/payments/repository"
 		);
-		await run(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }));
+		await run(activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }));
 		expect(getSucceededPaymentByEmail).not.toHaveBeenCalled();
 		expect(savePayment).not.toHaveBeenCalled();
 		expect(updatePaymentStatus).not.toHaveBeenCalled();
@@ -98,7 +100,7 @@ describe("the two donation entry points", () => {
 			"@infrastructure/services/payments/repository"
 		);
 		const { deferred } = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		await runDeferred(deferred);
 
@@ -115,7 +117,9 @@ describe("the two donation entry points", () => {
 				metadata: { email: "Payer@Example.COM", promoCode: "SAVE20", userAgent: "Firefox", ipAddress: "1.2.3.4" },
 			}) as never,
 		);
-		const { deferred } = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const { deferred } = await run(
+			activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }),
+		);
 		await runDeferred(deferred);
 
 		expect(savePayment).toHaveBeenCalledExactlyOnceWith({
@@ -131,7 +135,7 @@ describe("the two donation entry points", () => {
 		const { updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(updatePaymentStatus).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		const { deferred } = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 
 		await expect(runDeferred(deferred)).resolves.toBeUndefined();
@@ -147,7 +151,7 @@ describe("the two donation entry points", () => {
 		const { savePayment, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.fail(new DatabaseError({ message: "db down" })));
 		const { deferred } = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 
 		await expect(runDeferred(deferred)).resolves.toBeUndefined();
@@ -164,7 +168,7 @@ describe("the two donation entry points", () => {
 		const { savePayment, updatePaymentStatus } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(false));
 		const { deferred } = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		await runDeferred(deferred);
 
@@ -178,7 +182,7 @@ describe("the two donation entry points", () => {
 		const { savePayment } = await import("@infrastructure/services/payments/repository");
 		vi.mocked(savePayment).mockReturnValueOnce(Effect.succeed(true));
 		const { deferred } = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		await runDeferred(deferred);
 
@@ -193,7 +197,7 @@ describe("the two donation entry points", () => {
 		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
 			Effect.fail(new PaymentError({ message: "No such payment_intent: 'pi_3ABC'" })) as never,
 		);
-		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const err = await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 
 		expect(err).toBeInstanceOf(PaymentError);
 		expect(err).not.toBeInstanceOf(ValidationError);
@@ -204,7 +208,7 @@ describe("the two donation entry points", () => {
 			Effect.succeed({ ...SUCCEEDED_INTENT, status: "requires_payment_method" }) as never,
 		);
 		const err = await runFail(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		expect(err).toBeInstanceOf(ValidationError);
 		expect((err as ValidationError).message).toBe("Payment not completed");
@@ -215,14 +219,14 @@ describe("the two donation entry points", () => {
 			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: { email: "other@example.com" }, receipt_email: null }) as never,
 		);
 		const err = await runFail(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" }),
 		);
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
 	it("accepts the payer address retyped with different capitalisation, the only key Premium is recoverable by", async () => {
 		const result = await run(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "  TEST@Example.com " }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "  TEST@Example.com " }),
 		);
 		expect(result).toMatchObject({ email: "test@example.com" });
 	});
@@ -231,7 +235,7 @@ describe("the two donation entry points", () => {
 		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
 			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: { email: "Payer@Example.COM" } }) as never,
 		);
-		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const result = await run(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(result.email).toBe("payer@example.com");
 	});
 
@@ -243,18 +247,18 @@ describe("the two donation entry points", () => {
 				receipt_email: "payer@example.com",
 			}) as never,
 		);
-		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const result = await run(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(result.email).toBe("payer@example.com");
 	});
 
 	it("derives the payer email from the payment intent, the only address the Stripe return carries", async () => {
-		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const result = await run(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(result).toMatchObject({ email: "test@example.com", premiumKey: "pi_test" });
 	});
 
 	it("cannot be reached without a guard: activateWithPayment always runs the client-secret check", async () => {
 		const err = await runFail(
-			activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "fixture-client-WRONGx" }),
+			activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: "fixture-client-WRONGx" }),
 		);
 
 		expect(err).toBeInstanceOf(ValidationError);
@@ -263,7 +267,7 @@ describe("the two donation entry points", () => {
 
 	it("refuses an empty client secret rather than skipping the check", async () => {
 		const { createSession } = await import("@infrastructure/services/premium/session");
-		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "" }));
+		const err = await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: "" }));
 
 		expect(err).toBeInstanceOf(ValidationError);
 		expect((err as ValidationError).message).toBe("Client secret mismatch");
@@ -272,7 +276,7 @@ describe("the two donation entry points", () => {
 
 	it("cannot be reached without a guard: activateWithClaimedPayment always runs the email check", async () => {
 		const err = await runFail(
-			activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "attacker@example.com" }),
+			activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "attacker@example.com" }),
 		);
 
 		expect(err).toBeInstanceOf(ValidationError);
@@ -281,7 +285,7 @@ describe("the two donation entry points", () => {
 
 	it("refuses an empty expected email rather than skipping the check", async () => {
 		const { createSession } = await import("@infrastructure/services/premium/session");
-		const err = await runFail(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "" }));
+		const err = await runFail(activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "" }));
 
 		expect(err).toBeInstanceOf(ValidationError);
 		expect((err as ValidationError).message).toBe("Email mismatch");
@@ -289,13 +293,13 @@ describe("the two donation entry points", () => {
 	});
 
 	it("accepts the client secret Stripe appended to the return url", async () => {
-		const result = await run(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const result = await run(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(result).toMatchObject({ premiumKey: "pi_test", token: "jwt-token" });
 	});
 
 	it("does not mint a session for a mismatched client secret", async () => {
 		const { createSession } = await import("@infrastructure/services/premium/session");
-		await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: "fixture-client-WRONGx" }));
+		await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: "fixture-client-WRONGx" }));
 		expect(createSession).not.toHaveBeenCalled();
 	});
 
@@ -303,7 +307,7 @@ describe("the two donation entry points", () => {
 		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
 			Effect.succeed({ ...SUCCEEDED_INTENT, client_secret: null }) as never,
 		);
-		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const err = await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
@@ -311,7 +315,7 @@ describe("the two donation entry points", () => {
 		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
 			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never,
 		);
-		const err = await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		const err = await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(err).toBeInstanceOf(ValidationError);
 	});
 
@@ -320,7 +324,7 @@ describe("the two donation entry points", () => {
 		mockStripe.paymentIntents.retrieve.mockReturnValueOnce(
 			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: null }) as never,
 		);
-		await runFail(activateWithPayment({ paymentIntentId: "pi_test", clientSecret: CLIENT_SECRET }));
+		await runFail(activateWithPayment({ paymentIntentId: PAYMENT_INTENT_ID, clientSecret: CLIENT_SECRET }));
 		expect(createSession).not.toHaveBeenCalled();
 	});
 
@@ -329,7 +333,7 @@ describe("the two donation entry points", () => {
 			Effect.succeed({ ...SUCCEEDED_INTENT, metadata: {}, receipt_email: "test@example.com" }) as never,
 		);
 		await expect(
-			run(activateWithClaimedPayment({ paymentIntentId: "pi_test", expectedEmail: "test@example.com" })),
+			run(activateWithClaimedPayment({ paymentIntentId: PAYMENT_INTENT_ID, expectedEmail: "test@example.com" })),
 		).resolves.toMatchObject({ email: "test@example.com", premiumKey: "pi_test" });
 	});
 });

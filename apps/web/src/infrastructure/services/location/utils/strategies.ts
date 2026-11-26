@@ -2,7 +2,7 @@ import { logger } from "@infrastructure/logging/logger";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Cause, Effect } from "effect";
 import type { NextRequest } from "next/server";
-import { normalizeCountryCode, noStoreFetch, stringField } from "./normalize";
+import { type DetectedCountryCode, normalizeCountryCode, noStoreFetch, stringField } from "./normalize";
 
 const LOCATION_IDENTIFIER = "loc=";
 const CDN_TRACE = "cdn-cgi/trace";
@@ -28,18 +28,18 @@ const detectCountryFromCDNEffect = Effect.gen(function* () {
 const reasonOf = (failure: Error): string =>
 	failure instanceof Cause.UnknownException && failure.error instanceof Error ? failure.error.message : failure.message;
 
-export async function detectCountryFromCDN(): Promise<string> {
+export async function detectCountryFromCDN(): Promise<DetectedCountryCode | ""> {
 	return Effect.runPromise(
 		detectCountryFromCDNEffect.pipe(
 			Effect.catchAll((failure) => {
 				logger.warn({ message: "Error while detecting country from CDN", context: { reason: reasonOf(failure) } });
-				return Effect.succeed("");
+				return Effect.succeed<DetectedCountryCode | "">("");
 			}),
 		),
 	);
 }
 
-export function detectCountryFromHeaders(request: NextRequest): string {
+export function detectCountryFromHeaders(request: NextRequest): DetectedCountryCode | "" {
 	return normalizeCountryCode(request.headers.get(CLOUDFLARE_COUNTRY_HEADER));
 }
 
@@ -65,6 +65,8 @@ const detectCountryFromEgressIPEffect = Effect.gen(function* () {
 	return normalizeCountryCode(stringField({ body: geoBody, field: "country" }));
 });
 
-export async function detectCountryFromEgressIP(): Promise<string> {
-	return Effect.runPromise(detectCountryFromEgressIPEffect.pipe(Effect.orElse(() => Effect.succeed(""))));
+export async function detectCountryFromEgressIP(): Promise<DetectedCountryCode | ""> {
+	return Effect.runPromise(
+		detectCountryFromEgressIPEffect.pipe(Effect.orElse(() => Effect.succeed<DetectedCountryCode | "">(""))),
+	);
 }

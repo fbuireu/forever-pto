@@ -1,3 +1,5 @@
+import { paymentIntentIdSchema } from "@application/dto/payment/schema";
+import { zodParse } from "@application/shared/utils/zodParse";
 import { activateWithClaimedPayment, activateWithEmail } from "@application/use-cases/activatePremium";
 import { ApiError } from "@infrastructure/api/errors";
 import { activatePremiumRequest } from "@infrastructure/api/operations/activatePremium";
@@ -61,9 +63,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<object>> 
 
 			if (!email) return yield* Effect.fail(new ValidationError({ message: ApiError.EMAIL_REQUIRED }));
 
-			return yield* premiumKey
-				? activateWithClaimedPayment({ paymentIntentId: premiumKey, expectedEmail: email })
-				: activateWithEmail(email);
+			if (!premiumKey) return yield* activateWithEmail(email);
+
+			const paymentIntentId = yield* zodParse({ schema: paymentIntentIdSchema, data: premiumKey });
+
+			return yield* activateWithClaimedPayment({ paymentIntentId, expectedEmail: email });
 		}),
 	});
 

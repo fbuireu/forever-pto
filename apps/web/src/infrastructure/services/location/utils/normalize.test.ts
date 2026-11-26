@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { normalizeCountryCode, stringField, TOR_COUNTRY, UNIDENTIFIED_COUNTRY } from "./normalize";
+import {
+	isDetectedCountryCode,
+	normalizeCountryCode,
+	stringField,
+	TOR_COUNTRY,
+	UNIDENTIFIED_COUNTRY,
+} from "./normalize";
 
 describe("normalizeCountryCode", () => {
 	it("lower-cases a valid code", () => {
@@ -23,6 +29,26 @@ describe("normalizeCountryCode", () => {
 			expect(normalizeCountryCode(malformed)).toBe("");
 		},
 	);
+});
+
+describe("isDetectedCountryCode", () => {
+	it.each([["es"], ["de"], ["us"]])("accepts %s", (code) => {
+		expect(isDetectedCountryCode(code)).toBe(true);
+	});
+
+	it.each([["ES"], [" es"], ["es\n"], ["xx"], ["t1"], ["esp"], [""], [42], [null], [undefined]])(
+		"refuses %o, because only the lower-case form normalizeCountryCode hands back is a code",
+		(value) => {
+			expect(isDetectedCountryCode(value)).toBe(false);
+		},
+	);
+
+	it("agrees with normalizeCountryCode on every answer it gives", () => {
+		const answers = ["ES", "  DE \n", "xx", "t1", "ESP", ""].map(normalizeCountryCode);
+
+		expect(answers.filter(isDetectedCountryCode)).toEqual(["es", "de"]);
+		expect(answers.filter((answer) => !isDetectedCountryCode(answer))).toEqual(["", "", "", ""]);
+	});
 });
 
 describe("stringField", () => {

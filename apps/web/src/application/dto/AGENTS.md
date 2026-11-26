@@ -26,7 +26,7 @@ Not every folder needs every file. `email/` is `types.ts` alone and `premium/` h
 | `country/` | `CountryDTO` | `i18n-iso-countries` localised names |
 | `email/` | `SendEmailParams` | None |
 | `holiday/` | `HolidayDTO` | `date-holidays` |
-| `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `CreatePaymentResult`, `DiscountInfo`, the `PromoCodeErrors` a refused promo code answers with, the `ACTIVATION_PARAM` and `ACTIVATION_FAILED` the activation route writes and the confirmation page reads, the `ACTIVATION_COOKIE` its one-shot proof is named by, and in `schema.ts` the confirmation page's query | Stripe `PaymentIntent`, the donation form |
+| `payment/` | `PaymentConfirmationDTO`, `NewPayment` (what `paymentDataDTO` produces) and `PaymentData` (the stored record it grows into), `CreatePaymentInput`, `CreatePaymentResult`, `DiscountInfo`, the `PromoCodeErrors` a refused promo code answers with, the `ACTIVATION_PARAM` and `ACTIVATION_FAILED` the activation route writes and the confirmation page reads, the `ACTIVATION_COOKIE` its one-shot proof is named by, and in `schema.ts` the confirmation page's query and `paymentIntentIdSchema`, the constructor of the domain's `PaymentIntentId` | Stripe `PaymentIntent`, the donation form |
 | `premium/` | `PremiumSessionClaims`, what the session cookie's token signs (`email`, `paymentIntentId`), plus `PremiumSession`, the same session as `/api/check-session` answers it and the browser keeps it (`premiumKey`, `email`), and the route's other body schemas in `schema.ts` | None |
 | `region/` | `RegionDTO` | `i18n-iso-countries` localised names |
 
@@ -138,6 +138,14 @@ extra keys pass through, so a caller copies the fields it needs (`{ premiumKey: 
 rather than handing the validated body on. What each caller does with a *no* is the caller's decision and is recorded
 beside it: [`../../ui/AGENTS.md`](../../ui/AGENTS.md) for the two adapters, [`../../app/AGENTS.md`](../../app/AGENTS.md)
 for the confirmation page.
+
+**`paymentIntentIdSchema` is the exception, and it is read with `zodParse`.** Its answer is the value, not a yes or
+no: the schema is `z.string().refine(isPaymentIntentId, …)`, whose output is the domain's branded `PaymentIntentId`
+(`validate` narrows to the schema's input, a plain `string`, so only a parse hands the brand over). It wraps the
+domain's guard rather than minting a second brand with `.brand()`, so there is one nominal type and one check. The
+three callers (`GET /api/payment/activate`, `POST /api/check-session`, the confirmation page) compose it in front of the
+program that needs the id, so a refusal is a `ValidationError` carrying `invalid_payment_reference`; see
+[`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md).
 
 **`premium/schema.ts` is loaded lazily by one of its two importers, and that is what keeps zod off the first load.**
 [`checkSession.ts`](../../ui/adapters/session/checkSession.ts) is in the first-load chunk of every page, through the

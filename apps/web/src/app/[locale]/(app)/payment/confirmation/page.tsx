@@ -1,7 +1,8 @@
 import { hasSucceeded, wasCharged } from "@application/dto/payment/rules";
-import { paymentConfirmationQuerySchema } from "@application/dto/payment/schema";
+import { paymentConfirmationQuerySchema, paymentIntentIdSchema } from "@application/dto/payment/schema";
 import { ACTIVATION_FAILED } from "@application/dto/payment/types";
 import { Link } from "@application/i18n/navigation";
+import { zodParse } from "@application/shared/utils/zodParse";
 import { localePath } from "@infrastructure/i18n/utils/url";
 import { ApplicationLayer } from "@infrastructure/layers";
 import { routeMetadata } from "@infrastructure/seo/routeMetadata";
@@ -88,16 +89,23 @@ export default async function PaymentConfirmationPage({
 	params,
 }: Readonly<PaymentConfirmationPageProps>) {
 	const [query, { locale }] = await Promise.all([searchParams, params]);
-	const { payment_intent: paymentIntentId, activation } = paymentConfirmationQuerySchema.validate(query) ? query : {};
+	const { payment_intent: requestedIntent, activation } = paymentConfirmationQuerySchema.validate(query) ? query : {};
 	const hasActivated = activation !== ACTIVATION_FAILED;
 
-	if (!paymentIntentId) {
+	if (!requestedIntent) {
 		redirect(localePath({ locale }));
 	}
 
 	const data = await traced({
 		name: "paymentConfirmation",
-		run: () => Effect.runPromise(confirmation(paymentIntentId).pipe(Effect.provide(ApplicationLayer))),
+		run: () =>
+			Effect.runPromise(
+				zodParse({ schema: paymentIntentIdSchema, data: requestedIntent }).pipe(
+					Effect.flatMap(confirmation),
+					Effect.catchTag("ValidationError", () => Effect.succeed(null)),
+					Effect.provide(ApplicationLayer),
+				),
+			),
 	});
 
 	if (!data || !hasSucceeded(data)) {

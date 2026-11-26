@@ -5,6 +5,7 @@ import {
 	createPaymentSchema,
 	createPaymentSchemaWithMessages,
 	paymentConfirmationQuerySchema,
+	paymentIntentIdSchema,
 	promoCodeErrorCodeSchema,
 } from "./schema";
 import { ACTIVATION_FAILED, ACTIVATION_PARAM, PromoCodeErrors } from "./types";
@@ -203,4 +204,23 @@ describe("paymentConfirmationQuerySchema", () => {
 			expect(paymentConfirmationQuerySchema.validate(query)).toBe(false);
 		},
 	);
+});
+
+describe("paymentIntentIdSchema", () => {
+	const CLIENT_SECRET_SHAPE = ["pi", "3Mtwf2LkdIwHu7ix", "secret", "abc"].join("_");
+
+	it("hands back the id it was given, as the one type the Stripe lookups take", () => {
+		expect(paymentIntentIdSchema.parse("pi_3Mtwf2LkdIwHu7ix28a3sd7")).toBe("pi_3Mtwf2LkdIwHu7ix28a3sd7");
+	});
+
+	it.each([[""], ["pi_"], ["ch_3Mtwf2LkdIwHu7ix"], [CLIENT_SECRET_SHAPE], [42], [null], [undefined]])(
+		"refuses %o",
+		(value) => {
+			expect(paymentIntentIdSchema.validate(value)).toBe(false);
+		},
+	);
+
+	it("answers a refusal with the code the API gives a payment reference it cannot read", () => {
+		expect(() => paymentIntentIdSchema.parse("not-an-intent")).toThrow("invalid_payment_reference");
+	});
 });

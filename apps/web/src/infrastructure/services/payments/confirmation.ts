@@ -1,12 +1,13 @@
 import { paymentConfirmationDTO } from "@application/dto/payment/dto";
 import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
 import { PAYMENT_SUCCEEDED } from "@domain/payment/events/types";
+import type { PaymentIntentId } from "@domain/payment/paymentIntentId";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { LoggerService } from "@infrastructure/logging/service";
 import { Effect } from "effect";
 
 export const confirmation = (
-	paymentIntentId: string,
+	paymentIntentId: PaymentIntentId,
 ): Effect.Effect<PaymentConfirmationDTO | null, never, StripeServerService | LoggerService> =>
 	Effect.gen(function* () {
 		const stripe = yield* StripeServerService;

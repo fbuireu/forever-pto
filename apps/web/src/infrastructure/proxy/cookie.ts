@@ -1,3 +1,4 @@
+import type { DetectedCountryCode } from "@infrastructure/services/location/utils/normalize";
 import type { NextResponse } from "next/server";
 
 export const USER_COUNTRY_COOKIE = "user-country";
@@ -5,7 +6,7 @@ export const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export interface SetLocationCookieParams {
 	response: NextResponse;
-	country: string;
+	country: DetectedCountryCode;
 }
 
 export function setLocationCookie({ response, country }: SetLocationCookieParams): void {

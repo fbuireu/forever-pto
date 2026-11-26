@@ -186,6 +186,12 @@ beside the [`next.config.ts`](./next.config.ts) that rewrites it.
   `next-env.d.ts`). The reason for a line goes in the commit message, the pull request, an ADR or
   [CODING_STANDARDS.md](../../CODING_STANDARDS.md). Directives (`'use client'`, `'use server'`) are strings, not
   comments. The contract suite fails on a comment wherever it sits: opening a line, trailing code, or inside JSX.
+- **A branded primitive is `string & { readonly [fooBrand]: true }`, a plain string at run time, and a `value is Foo`
+  guard beside the type is the one way to make it**: no `as`, in a test either, so the storage, the JSON and the wire
+  are unchanged. A value enters through the guard at the boundary that proves it (a schema that wraps the guard where a
+  caller reads the parsed value), and what Stripe or a table supplied stays a `string`. There are two:
+  `PaymentIntentId` ([`src/domain/payment/paymentIntentId.ts`](./src/domain/payment/paymentIntentId.ts)) and
+  `DetectedCountryCode` ([`src/infrastructure/services/location/utils/normalize.ts`](./src/infrastructure/services/location/utils/normalize.ts)).
 
 ## Gotchas
 

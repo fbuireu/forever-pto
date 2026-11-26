@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import en from "@i18n/messages/en.json";
 import { EN } from "@infrastructure/i18n/locales";
+import { LoggerService } from "@infrastructure/logging/service";
 import { type RenderResult, render } from "@testing-library/react";
 import { Effect, Layer } from "effect";
 import { createFormatter, createTranslator, type Locale, NextIntlClientProvider } from "next-intl";
@@ -36,7 +37,7 @@ const declaring = componentFiles(SRC_ROOT)
 const mockConfirmation = vi.hoisted(() => vi.fn());
 const mockGetTranslations = vi.hoisted(() => vi.fn());
 const mockGetFormatter = vi.hoisted(() => vi.fn());
-const mockLogger = { warn: vi.fn(), logError: vi.fn() };
+const mockLogger = vi.hoisted(() => ({ warn: vi.fn(), logError: vi.fn() }));
 
 interface GetTranslationsParams {
 	locale: Locale;
@@ -53,7 +54,14 @@ vi.mock("next/dynamic", () => ({ default: () => () => null }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 vi.mock("@application/i18n/navigation", () => ({ Link: () => null }));
 vi.mock("@application/shared/utils/clientLog", () => ({ logClientError: vi.fn() }));
-vi.mock("@infrastructure/layers", () => ({ ApplicationLayer: Layer.empty }));
+vi.mock("@infrastructure/layers", () => ({
+	ApplicationLayer: Layer.succeed(LoggerService, {
+		info: vi.fn(),
+		warn: vi.fn(),
+		error: vi.fn(),
+		logError: vi.fn(),
+	}),
+}));
 vi.mock("@infrastructure/services/payments/confirmation", () => ({ confirmation: mockConfirmation }));
 vi.mock("@infrastructure/logging/logger", () => ({
 	logger: mockLogger,
@@ -77,9 +85,9 @@ const { NotFoundContent } = await import("@ui/modules/pages/not-found/NotFoundCo
 const { ErrorContent } = await import("@ui/modules/pages/error/ErrorContent");
 
 const locale = Promise.resolve<{ locale: Locale }>({ locale: EN });
-const searchParams = Promise.resolve({ payment_intent: "pi_test_123" });
+const searchParams = Promise.resolve({ payment_intent: "pi_test123" });
 
-const CONFIRMATION = { id: "pi_test_123", status: "succeeded", amount: 10, currency: "USD" };
+const CONFIRMATION = { id: "pi_test123", status: "succeeded", amount: 10, currency: "USD" };
 
 const landmarks = (tree: RenderResult): number => tree.container.querySelectorAll(`#${MAIN_CONTENT_ID}`).length;
 

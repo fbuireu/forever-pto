@@ -168,7 +168,7 @@ ranking.
 | [`api/payment/route.ts`](./api/payment/route.ts) | POST | Creates a Stripe PaymentIntent for a Donation. `createPaymentRequest` rate-limits on the client address (`resolveClientIp`) before it reads the body |
 | [`api/payment/activate/route.ts`](./api/payment/activate/route.ts) | GET | Stripe's `return_url`. Activates Premium and redirects to the confirmation page with the cookie already set; see *The redirect hand-off* below |
 | [`api/webhooks/stripe/route.ts`](./api/webhooks/stripe/route.ts) | POST | Verifies the `stripe-signature` header, then hands the event to `processWebhookEvent`. Reads the **raw** body via `request.text()`; parsing it as JSON would break signature verification |
-| [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key, and sets the cookie. GET treats "did not verify" and "could not verify" differently: see *The GET half of check-session distinguishes did not verify from could not verify* below |
+| [`api/check-session/route.ts`](./api/check-session/route.ts) | GET, POST | GET verifies the premium cookie; POST activates Premium from an email, optionally with a payment key (read through `paymentIntentIdSchema`: one that is no payment intent id answers 400 `invalid_payment_reference`), and sets the cookie. GET treats "did not verify" and "could not verify" differently: see *The GET half of check-session distinguishes did not verify from could not verify* below |
 | [`api/contact/route.ts`](./api/contact/route.ts) | POST | Contact form submission, through `sendContactRequest`. No IP rate limit: `sendContactEmail` refuses a sender inside the cooldown or a repeated message; see [`../application/use-cases/AGENTS.md`](../application/use-cases/AGENTS.md) |
 | `api/markdown/route.ts` | GET | Renders the Markdown twin of a page via [`buildMarkdownPage.ts`](../infrastructure/markdown/buildMarkdownPage.ts). Only reached through the proxy rewrite, and only *drivable* through it: the pathname comes from the `x-markdown-path` header, never the query string |
 | [`api/health/route.ts`](./api/health/route.ts) | GET | Liveness probe. Answers `status` and `timestamp` and nothing else |
@@ -245,7 +245,9 @@ route handler or a server action can, and that constraint is what decides this s
 guards:
 
 - **The client secret is required and verified, by the type as well as by this route.**
-  `activateWithPayment` takes `{ paymentIntentId, clientSecret }` with both required, and compares the secret
+  `activateWithPayment` takes `{ paymentIntentId, clientSecret }` with both required, the id as a `PaymentIntentId`
+  that the handler reads through `paymentIntentIdSchema` inside the program (a malformed one is a `ValidationError`,
+  so no cookie and `activation=failed`, as an id Stripe refuses already was), and compares the secret
   against the retrieved intent's own `client_secret` through `matchesClientSecret`
   ([`src/infrastructure/services/premium/activation.ts`](../infrastructure/services/premium/activation.ts)), in constant time and length-first. Without it,
   anyone holding a leaked payment intent id could mint a session. The length check is not tidiness: the loop
@@ -510,7 +512,9 @@ the other way out). [`api/health/route.test.ts`](./api/health/route.test.ts) run
   repeated parameter over as an array, which `has()` passes too: a repeated `payment_intent` would reach Stripe as
   an array, and a repeated `activation` compares unequal to `failed` and would claim Premium is active. A query
   that fails the schema reads as empty, so it redirects home like a missing `payment_intent`, and the check is
-  what narrows `payment_intent` to a string before `confirmation` runs.
+  what narrows `payment_intent` to a string. Before `confirmation` runs the page reads that string through
+  `paymentIntentIdSchema` with `zodParse` inside the same program, because `confirmation` takes a `PaymentIntentId`:
+  one that is not a payment intent id answers `null`, which is the failure card, without a Stripe call.
 - **A path beginning with two slashes reaches the proxy's redirect.** `config.matcher` excludes, beyond `/api`,
   `/_next` and `/_vercel`, only a **literal** dot, so `//1234567890/payment/confirmation` arrives, and a leading `/%2e`
   is stripped as a dot segment after the match, leaving the doubled slash behind; `new URL(homePath, request.url)`

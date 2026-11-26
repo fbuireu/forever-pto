@@ -61,6 +61,15 @@ ASCII letters, and reject the sentinels `XX` and `T1`, which mean unidentified t
 Whatever a strategy answers reaches the week-long `user-country` cookie and then `new Holidays(country)`.
 `noStoreFetch` beside it owns `cache: 'no-store'` and the 5 s timeout.
 
+**`DetectedCountryCode` is that rule as a type.** It is `string & { readonly [detectedCountryCodeBrand]: true }`, a plain
+string at run time, and `isDetectedCountryCode` is the one way to make it; `normalizeCountryCode` answers one or `''`,
+so every strategy and `detectCountry` return `DetectedCountryCode | ''`. `setLocationCookie` in
+[`../../proxy/cookie.ts`](../../proxy/cookie.ts) takes nothing else, so a value that skipped the exit cannot reach the
+cookie by a compile-time slip. The cookie a request already carries is a value a visitor can edit, so
+[`proxy/location.ts`](../../proxy/location.ts) re-sets it only when it passes the same guard (an upper-case, three-letter
+or sentinel value is detected afresh instead). The browser's own read of that cookie, `getUserCountryFromCookie`, stays a
+`string`: the `ui` layer reaches `@infrastructure/*` only through the listed seams, and this file is not one.
+
 **Effect is used here but never escapes.** Both async strategies are `Effect.gen` programs terminated inside
 their own wrapper with `Effect.runPromise`, because the proxy has no `ApplicationLayer` to provide. For
 the same reason logging goes through the `logger` import rather than `LoggerService`,

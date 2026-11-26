@@ -38,7 +38,7 @@ vi.mock("next/server", async (importOriginal) => {
 const { GET } = await import("./route");
 
 const CLIENT_SECRET = "fixture-client-secret";
-const PAYMENT_INTENT_ID = "pi_test_123";
+const PAYMENT_INTENT_ID = "pi_test123";
 
 interface MakeRequestParams {
 	query: Record<string, string>;
@@ -121,6 +121,16 @@ describe("GET /api/payment/activate", () => {
 
 	it("refuses to activate without the client secret, so a leaked payment intent id is not enough", async () => {
 		const response = await GET(makeRequest({ query: { payment_intent: PAYMENT_INTENT_ID } }));
+
+		expect(mockActivateWithPayment).not.toHaveBeenCalled();
+		expect(response.cookies.get(PREMIUM_COOKIE)).toBeUndefined();
+		expect(locationOf(response).searchParams.get(ACTIVATION_PARAM)).toBe(ACTIVATION_FAILED);
+	});
+
+	it("refuses a payment_intent that is no payment intent id, so the client secret in its place never reaches the use case", async () => {
+		const response = await GET(
+			makeRequest({ query: { ...successfulQuery, payment_intent: `${PAYMENT_INTENT_ID}_secret_fixture` } }),
+		);
 
 		expect(mockActivateWithPayment).not.toHaveBeenCalled();
 		expect(response.cookies.get(PREMIUM_COOKIE)).toBeUndefined();

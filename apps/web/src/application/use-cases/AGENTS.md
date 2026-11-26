@@ -100,7 +100,9 @@ The paths are deliberately asymmetric, and this is the trap:
   thin entry points over one private `activateFromDonation`, which retrieves the payment intent from Stripe,
   rejects anything not `succeeded`, and takes the payer's address from `metadata.email` or `receipt_email`.
   An intent carrying neither was not created by the Donation flow and cannot prove the caller owns it, so it
-  is refused rather than trusted. **The extra check each entry point adds is a required parameter of that
+  is refused rather than trusted. Both take the `paymentIntentId` as a `PaymentIntentId`, so the route has already
+  read it through `paymentIntentIdSchema` and an id that was never checked cannot reach Stripe from here (the brand
+  is in [`../../domain/payment/AGENTS.md`](../../domain/payment/AGENTS.md)). **The extra check each entry point adds is a required parameter of that
   entry point, not an optional one on a shared function**: `activateWithPayment({ paymentIntentId,
   clientSecret })` for `GET /api/payment/activate`, which holds the secret Stripe appended to the
   `return_url`; `activateWithClaimedPayment({ paymentIntentId, expectedEmail })` for `POST

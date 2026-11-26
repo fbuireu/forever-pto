@@ -1,3 +1,4 @@
+import { isPaymentIntentId } from "@domain/payment/paymentIntentId";
 import { z } from "zod";
 import { ACTIVATION_PARAM, PromoCodeErrors } from "./types";
 
@@ -56,6 +57,8 @@ export const createDonationFormSchemaWithMessages = (
 export type DonationFormValues = z.input<ReturnType<typeof createDonationFormSchemaWithMessages>>;
 
 export const promoCodeErrorCodeSchema = z.enum(PromoCodeErrors);
+
+export const paymentIntentIdSchema = z.string().refine(isPaymentIntentId, "invalid_payment_reference");
 
 export const paymentConfirmationQuerySchema = z.object({
 	payment_intent: z.string().optional(),

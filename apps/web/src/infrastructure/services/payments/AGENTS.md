@@ -21,7 +21,7 @@ read by the premium activation path as well as by the payment one.
 | `repository.ts` | `savePayment`, `updatePaymentStatus`, `updatePaymentCharge`, `getSucceededPaymentByEmail`, `countPromoCodeRedemptions`, the `PaymentChargeData` shape | `TursoService` |
 | [`normalizeEmail.ts`](./normalizeEmail.ts) | `normalizeEmail(email)`: trim and lower-case, applied on both sides of every address comparison | None |
 | [`normalForms.ts`](./normalForms.ts) | `PAYMENT_CURRENCY` and `normalizePromoCode(code)`: the forms every payment value has to be written in, at every site that writes one | None |
-| [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)`: a `PaymentConfirmationDTO`, or `null` on any failure; warns through the tag when the intent is not `succeeded`, so the page renders and never logs | `StripeServerService`, `LoggerService` |
+| [`confirmation.ts`](./confirmation.ts) | `confirmation(paymentIntentId)`, which takes a `PaymentIntentId`: a `PaymentConfirmationDTO`, or `null` on any failure; warns through the tag when the intent is not `succeeded`, so the page renders and never logs | `StripeServerService`, `LoggerService` |
 | [`rateLimit.ts`](./rateLimit.ts) | `checkRateLimit(ip)`: fails with `RateLimitError` | the Cloudflare `PAYMENT_RATE_LIMITER` binding |
 | [`provider/intent.ts`](./provider/intent.ts) | `createPaymentIntent(params)`: the Stripe intent behind a Donation, which takes its metadata block from `donationMetadata` | `StripeServerService` |
 | [`provider/metadata.ts`](./provider/metadata.ts) | `donationMetadata(params)` and `readDonationMetadata(intent)`: the writer and the reader of that block, and `clampMetadata(value)`, the clamp every free-text field goes through | None |

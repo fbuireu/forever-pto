@@ -1,4 +1,5 @@
 import type { PaymentConfirmationDTO } from "@application/dto/payment/types";
+import { paymentIntentIdFixture } from "@domain/payment/fixture";
 import { StripeServerService } from "@infrastructure/clients/payments/stripe/serverService";
 import { PaymentError } from "@infrastructure/errors";
 import { LoggerService } from "@infrastructure/logging/service";
@@ -30,7 +31,7 @@ const MockLoggerLayer = Layer.succeed(LoggerService, {
 const MockLayer = Layer.mergeAll(MockStripeLayer, MockLoggerLayer);
 
 const run = (id: string): Promise<PaymentConfirmationDTO | null> =>
-	Effect.runPromise(confirmation(id).pipe(Effect.provide(MockLayer)));
+	Effect.runPromise(confirmation(paymentIntentIdFixture(id)).pipe(Effect.provide(MockLayer)));
 
 beforeEach(() => {
 	vi.clearAllMocks();

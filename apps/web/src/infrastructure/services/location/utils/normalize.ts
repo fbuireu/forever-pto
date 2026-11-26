@@ -1,15 +1,20 @@
+declare const detectedCountryCodeBrand: unique symbol;
+
+export type DetectedCountryCode = string & { readonly [detectedCountryCodeBrand]: true };
+
 export const UNIDENTIFIED_COUNTRY = "XX";
 export const TOR_COUNTRY = "T1";
 
 const COUNTRY_CODE = /^[a-z]{2}$/;
 const SENTINELS = new Set([UNIDENTIFIED_COUNTRY.toLowerCase(), TOR_COUNTRY.toLowerCase()]);
 
-export const normalizeCountryCode = (raw: string | null | undefined): string => {
+export const isDetectedCountryCode = (value: unknown): value is DetectedCountryCode =>
+	typeof value === "string" && COUNTRY_CODE.test(value) && !SENTINELS.has(value);
+
+export const normalizeCountryCode = (raw: string | null | undefined): DetectedCountryCode | "" => {
 	const code = (raw ?? "").trim().toLowerCase();
 
-	if (!COUNTRY_CODE.test(code) || SENTINELS.has(code)) return "";
-
-	return code;
+	return isDetectedCountryCode(code) ? code : "";
 };
 
 export interface NoStoreFetchParams {

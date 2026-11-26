@@ -3,8 +3,9 @@
 ## Purpose
 
 What a Donation is once Stripe has decided: the events its webhook turns into and the statuses a payment can be
-in. Types and constants only, and pure like the rest of the domain: no Effect, no `@infrastructure/*`, no Stripe
-type ([ADR 0023](../../../../../docs/adr/0023-the-payment-domain-is-types.md)). The layer contract is in
+in, and the one identifier the payer's browser hands back. Types, constants and one predicate, and pure like the
+rest of the domain: no Effect, no `@infrastructure/*`, no Stripe type
+([ADR 0023](../../../../../docs/adr/0023-the-payment-domain-is-types.md)). The layer contract is in
 [`../AGENTS.md`](../AGENTS.md).
 
 There is no accounts table: a payment row with status `succeeded` *is* Premium
@@ -16,6 +17,8 @@ keeping that row honest.
 | File | Contents |
 | --- | --- |
 | [`events/types.ts`](./events/types.ts) | `PaymentSucceededEvent` and `PaymentFailedEvent` (plain interfaces, no Stripe types) plus `PAYMENT_STATUSES`, the `PaymentStatus` union derived from it, the widened `ReportedPaymentStatus` that the events actually carry, and the `PAYMENT_SUCCEEDED` constant |
+| [`paymentIntentId.ts`](./paymentIntentId.ts) | `PaymentIntentId`, a branded `string`, and `isPaymentIntentId`, the only way to make one |
+| [`fixture.ts`](./fixture.ts) | `paymentIntentIdFixture(value)`: a test's `PaymentIntentId`, built through the guard and throwing when the guard refuses |
 
 ## Who builds and who reads it
 
@@ -30,6 +33,30 @@ keeping that row honest.
 `processWebhookEvent` builds an event through the adapter and hands it to one handler per branch; the handlers'
 invariants are in [`../../application/use-cases/AGENTS.md`](../../application/use-cases/AGENTS.md), the adapter's in
 [`../../infrastructure/services/payments/AGENTS.md`](../../infrastructure/services/payments/AGENTS.md).
+
+## `PaymentIntentId` marks an id this app has read, not one Stripe supplied
+
+`PaymentIntentId` is `string & { readonly [paymentIntentIdBrand]: true }`: a plain string at run time, so the wire,
+the JWT claim and the `payments.id` column are unchanged. The one way to make it is `isPaymentIntentId`, which
+accepts `pi_` and Stripe's alphanumeric tail and nothing else. The tail holds no underscore, which is what keeps
+a client secret (`pi_…_secret_…`, which starts with the id it belongs to) from passing for an id. No cast makes
+one, in a test either: `paymentIntentIdFixture` narrows through the guard.
+
+**It enters at the three places the payer's browser names an intent**, through `paymentIntentIdSchema` in
+[`@application/dto/payment/schema`](../../application/dto/payment/schema.ts), which wraps the guard so the app layer
+reaches it without importing the domain: the `payment_intent` of `GET /api/payment/activate`, the `premiumKey` of
+`POST /api/check-session`, and the `payment_intent` of the confirmation page. What it fails with is a
+`ValidationError` carrying `invalid_payment_reference`, the code the API already answers a reference Stripe refuses
+with, so a malformed id reads as it did before and no longer costs a Stripe round trip. What takes one is what
+hands an id to Stripe: `paymentIntents.retrieve`, `confirmation`, `activateWithPayment` and
+`activateWithClaimedPayment`.
+
+**What Stripe or the database supplies stays a `string`, on purpose.** The events' `paymentId`, `NewPayment.id`
+and `PaymentData.id`, the JWT's `paymentIntentId` claim and the client's `premiumKey` are not narrowed: a branded
+id built from them would need a check with no honest failure to return (Stripe does not send a malformed id), or
+would refuse a stored row an older deploy wrote, which `PaymentData.status` already refuses to guess at. The brand
+therefore says *the caller proved the shape before this reached Stripe*, and a value read back from our own
+tables is not asked to.
 
 ## An event carries what a handler acts on, not a copy of the intent
 
@@ -102,6 +129,9 @@ a query string to remove them would trade a checkable drift for something that r
 | Anything the payer sees | `@ui/adapters/payments` and the payment pages |
 
 ## Testing
+
+[`paymentIntentId.test.ts`](./paymentIntentId.test.ts) walks the guard over a client secret, a charge id and the
+inputs a query string or a body can hand it, and the fixture over the one it refuses.
 
 `events/types.ts` has no test of its own: it holds types and two constants, and nothing in it runs.
 `PAYMENT_STATUSES` is read by the contract suite against the installed SDK and by

@@ -316,7 +316,7 @@ payment, because it does neither itself: that ordering lives in the operation an
   layer. The stores and components reach the same object through `logClient`'s dynamic import instead; see
   [`../ui/AGENTS.md`](../ui/AGENTS.md).
 - **Country detection sits in front of every HTML response.** [`proxy/location.ts`](./proxy/location.ts) re-sets an existing
-  `user-country` cookie instead of re-running [`detectCountry.ts`](./services/location/detectCountry.ts), which is a subrequest with its own timeout.
+  `user-country` cookie, when it is a `DetectedCountryCode`, instead of re-running [`detectCountry.ts`](./services/location/detectCountry.ts), which is a subrequest with its own timeout.
   Writing back a value it already has is not redundant: it slides the week-long expiry forward on every
   visit, so the chain stays off the hot path for as long as the visitor keeps coming back. Do not
   "simplify" that branch away.

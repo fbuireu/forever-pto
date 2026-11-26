@@ -1,23 +1,26 @@
+import { paymentIntentIdSchema } from "@application/dto/payment/schema";
 import { ACTIVATION_FAILED, ACTIVATION_PARAM } from "@application/dto/payment/types";
+import { zodParse } from "@application/shared/utils/zodParse";
 import { activateWithPayment } from "@application/use-cases/activatePremium";
 import { activatePremiumRequest } from "@infrastructure/api/operations/activatePremium";
 import { resolveClientIp } from "@infrastructure/api/operations/types";
 import { localePath, resolveLocale } from "@infrastructure/i18n/utils/url";
 import { setActivationCookie, setPremiumCookie } from "@infrastructure/services/premium/cookie";
+import { Effect } from "effect";
 import { type NextRequest, NextResponse } from "next/server";
 
 const SUCCEEDED_REDIRECT_STATUS = "succeeded";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
 	const { searchParams, origin } = request.nextUrl;
-	const paymentIntentId = searchParams.get("payment_intent");
+	const requestedIntent = searchParams.get("payment_intent");
 	const clientSecret = searchParams.get("payment_intent_client_secret");
 	const redirectStatus = searchParams.get("redirect_status");
 	const requested = searchParams.get("locale");
 	const locale = resolveLocale(requested);
 
 	const destination = new URL(localePath({ locale, path: "/payment/confirmation" }), origin);
-	if (paymentIntentId) destination.searchParams.set("payment_intent", paymentIntentId);
+	if (requestedIntent) destination.searchParams.set("payment_intent", requestedIntent);
 
 	const redirectTo = (activated: boolean) => {
 		if (!activated) destination.searchParams.set(ACTIVATION_PARAM, ACTIVATION_FAILED);
@@ -26,12 +29,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 		return response;
 	};
 
-	if (!paymentIntentId || !clientSecret) return redirectTo(false);
+	if (!requestedIntent || !clientSecret) return redirectTo(false);
 	if (redirectStatus && redirectStatus !== SUCCEEDED_REDIRECT_STATUS) return redirectTo(false);
 
 	const { token } = await activatePremiumRequest({
 		context: { ipAddress: resolveClientIp(request.headers) },
-		program: activateWithPayment({ paymentIntentId, clientSecret }),
+		program: zodParse({ schema: paymentIntentIdSchema, data: requestedIntent }).pipe(
+			Effect.flatMap((paymentIntentId) => activateWithPayment({ paymentIntentId, clientSecret })),
+		),
 	});
 
 	if (!token) return redirectTo(false);
