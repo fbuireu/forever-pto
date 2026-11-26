@@ -21,7 +21,7 @@ All of them are scoped to `path: '/'`.
 
 ## `user-country`
 
-Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the proxy chain: `apps/web/src/middleware.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which re-sets a cookie the request already carries, renewing its week without detecting anything, and otherwise detects the country from the request and sets the cookie on the response when a country came back. It is deliberately **not** `httpOnly`, because `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
+Exported as `USER_COUNTRY_COOKIE` in `apps/web/src/infrastructure/proxy/cookie.ts`, which also defines `setLocationCookie()` and the attributes above. It is written by the proxy chain: `apps/web/src/middleware.ts` → `apps/web/src/infrastructure/proxy/location.ts`, which re-sets a cookie the request already carries when it is a detected country code, renewing its week without detecting anything, and otherwise detects the country from the request and sets the cookie on the response when a country came back. It is deliberately **not** `httpOnly`, because `apps/web/src/ui/modules/stores/StoresInitializer.tsx` reads it on the client to seed the location store. See [country detection](/how-it-works/country-detection/).
 
 ## `NEXT_LOCALE`
 

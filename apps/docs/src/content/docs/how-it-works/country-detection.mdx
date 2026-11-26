@@ -10,7 +10,7 @@ When you open Forever PTO, the planner already knows your country. That value tr
 ## The chain
 
 1. `apps/web/src/middleware.ts` runs the last step of the proxy, (after markdown negotiation, the payment-confirmation guard and i18n) calls the location proxy with the `next-intl` response.
-2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` re-sets a `user-country` cookie the request already carries, which renews its week, and detects nothing. Only without one does it run `detectCountry(request)`, and it calls `setLocationCookie()` only if a country came back.
+2. `apps/web/src/infrastructure/proxy/location.ts`: `location()` re-sets a `user-country` cookie the request already carries, which renews its week, and detects nothing, provided the cookie is a detected code: a value that is not (upper case, three letters, a sentinel) is a cookie the visitor edited, and it is detected afresh instead. Only without one does it run `detectCountry(request)`, and it calls `setLocationCookie()` only if a country came back.
 3. `apps/web/src/infrastructure/services/location/detectCountry.ts` takes the `cf-ipcountry` header's answer whenever the header is present, and tries the two network strategies in order only when it is absent.
 4. `apps/web/src/infrastructure/services/location/utils/strategies.ts` implements the strategies as Effect programs.
 
@@ -50,7 +50,7 @@ flowchart TD
   C -->|country| OK
 ```
 
-Every strategy leaves through `normalizeCountryCode` (`apps/web/src/infrastructure/services/location/utils/normalize.ts`), the one exit rule: trim, lower-case, reject anything that is not two ASCII letters, and reject the sentinels `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes). Both network strategies fetch through `noStoreFetch` beside it, which owns `cache: 'no-store'` and the 5-second `AbortSignal.timeout`.
+Every strategy leaves through `normalizeCountryCode` (`apps/web/src/infrastructure/services/location/utils/normalize.ts`), the one exit rule: trim, lower-case, reject anything that is not two ASCII letters, and reject the sentinels `XX` (`UNIDENTIFIED_COUNTRY`) and `T1` (`TOR_COUNTRY`, Tor exit nodes). What passes is typed `DetectedCountryCode`, a branded string made only by `isDetectedCountryCode`, and `setLocationCookie()` takes nothing else, so a value that skipped the exit cannot reach the cookie. Both network strategies fetch through `noStoreFetch` beside it, which owns `cache: 'no-store'` and the 5-second `AbortSignal.timeout`.
 
 ### 1. `cf-ipcountry` header (`detectCountryFromHeaders`)
 
